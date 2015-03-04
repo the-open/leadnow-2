@@ -1,0 +1,17 @@
+# Development database
+db.sqlite3
+
+# Local settings
+local_settings.py
+
+# Temp files
+*.*~
+*~
+.*.swp
+
+# Compiled python
+*.pyc
+
+# virtualenv
+python/
+
