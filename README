@@ -1,0 +1,11 @@
+This is a normal Django project.
+
+Install Django (pip install Django==1.6.6 to be consistent with my version).
+
+./manage syncdb
+./manage runserver
+
+
+Virtualenv is recommended but not required.
+
+This README is short and sweet, and really just to test that I'm pushing to the right repo.
