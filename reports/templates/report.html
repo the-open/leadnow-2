@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <h2>Query results!</h2>
+  
+  {% for row in results %}
+    {% for col in row %}
+      {{ col }} |
+    {% endfor %}
+    <br/>
+  {% endfor %}
+  
+  
+{% endblock %}

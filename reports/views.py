@@ -1,18 +1,48 @@
 import csv
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.db import connection
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 
-from forms import ImportCsvForm
-from models import Supporter, Campaign, Email, Action
+from forms import ImportCsvForm, QueryForm
+from models import Supporter, Campaign, Email, Action, Query
 
 def home(request):
   return render(request, 'home.html', {})
-  
+
+# Display a list of saved queries, plus an area to enter a new custom query  
 def query(request):
+  queries = Query.objects.all()
+  return render(request, 'query.html', {'queries': queries})
+
+
+# When we have saved queries, this will let you see the details of a saved query
+def query_details(request, query_id):
   return render(request, 'query.html', {})
+
+
+# Run an actual query!
+def report(request):
+
+  # eventually we won't use direct access to the POST param for this...
+  if not request.POST.get('qry', None):
+    messages.add_message(request, messages.ERROR, 'No query provided!')
+    return HttpResponseRedirect(reverse('query'))
   
+  
+  # TODO: validate, ensure they don't attempt an INSERT/UPDATE/DELETE operation!
+  # this code is an injection attack waiting to happen; good thing we trust our users!
+  # (famous last words?)
+  cursor = connection.cursor()
+
+  cursor.execute(request.POST['qry'])
+  results = cursor.fetchall()
+  
+  return render(request, 'report.html', {'results': results})
+  
+  
+# Import a spreadsheet of data
 def import_csv(request):
   # Get the uploaded CSV
   if request.method == 'POST':
