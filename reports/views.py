@@ -25,10 +25,6 @@ def import_csv(request):
       # TODO: what if the ordering of headers changes?
 
       for row in reader:
-        # for testing...
-        if i > 5:
-          break
-        
         # skip headers
         if i == 0:
           pass
