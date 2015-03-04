@@ -3,12 +3,72 @@
 {% block body %}
   <h2>Query results!</h2>
   
-  {% for row in results %}
-    {% for col in row %}
-      {{ col }} |
-    {% endfor %}
+  <div style='padding: 25px; margin: 15px; border: 1px solid; border-radius: 0.5em;'>
+    <strong>Apply visualization:</strong><br/>
+    [<a href="#" id="vis_email">email performance</a>]
+    [<a href="#">page action</a>]
     <br/>
-  {% endfor %}
+    <em>visualizations expect certain data formats - they won't work with arbitrary queries!</em>
+  </div>
+  
+  <div id="graph" style='width: 750px; height: 550px; display: none;'>
+  </div>
+  
+  <table class="table striped-table" id="datatable">
+    {% for row in results %}
+      <tr>
+        {% for col in row %}
+          <td>{{ col }}</td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </table>
   
   
+{% endblock %}
+
+{% block javascript %}
+  var r = Raphael("graph");
+  
+  function email_chart() {
+    var data = [];
+    var headings = [];
+
+    $('#datatable tr').each(function(idx) {
+      $('td', $(this)).each(function(idx2) {
+        if (idx2 == 0)
+          //headings.push($(this).html());
+          headings.push(idx);
+        else {
+          if (idx == 0)
+            data.push([]);
+            
+          data[idx2-1].push($(this).html());
+        }
+      });
+    });
+    
+    r.linechart(25, 25, 750, 500, headings, data,
+                  {axis: "0 0 1 1", nostroke: false, smooth: true})
+                  .hoverColumn(function() {
+                                this.tags = r.set();
+                                for (var i = 0, ii = this.y.length; i < ii; i++) {
+                                    this.tags.push(r.tag(this.x, this.y[i], this.values[i], 160, 10).insertBefore(this));
+                                }                              },
+                              function() {
+                                this.tags && this.tags.remove();
+                            }
+                 );
+    
+  }
+  
+  $('#vis_email').click(function() {
+    $('#graph').show(function() {
+      email_chart();
+      
+      $('svg', $("#graph")).height($('#graph').height());
+      $('svg', $("#graph")).width($('#graph').width());
+    });
+    return false;
+  });
 {% endblock %}
