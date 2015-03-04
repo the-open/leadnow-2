@@ -12,4 +12,8 @@ urlpatterns = patterns('',
 
 
     url(r'^$', 'reports.views.home', name='home'),
+
+    url(r'^query/$', 'reports.views.query', name='query'),
+
+    url(r'^importcsv/$', 'reports.views.import_csv', name='import_csv'),
 )

@@ -1,1 +1,18 @@
-Hello, world!
+{% extends 'base.html' %}
+
+{% block body %}
+  <h1>Report Generator</h1>
+  
+  From here, you can ...
+  
+  <ul>
+    <li>
+      <a href="{% url 'query' %}">Generate a report</a>
+    </li>
+    
+    <li>  
+      <a href="{% url 'import_csv' %}">Import a spreadsheet</a>
+    </li>
+  <br/>
+  
+{% endblock %}

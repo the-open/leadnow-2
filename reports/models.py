@@ -7,13 +7,13 @@ class Supporter(models.Model):
   created = models.DateTimeField(db_index=True)
   modified = models.DateTimeField(db_index=True)
   
-  postal_code = models.CharField(max_length=6, blank=True, null=True)
+  postal_code = models.CharField(max_length=25, blank=True, null=True)
 
 class Campaign(models.Model):
   class Meta:
     db_table = 'campaigns'
   
-  name = models.CharField(max_length=255)
+  name = models.CharField(max_length=255, db_index=True)
   campaign_type = models.CharField(max_length=25)
   campaign_status = models.CharField(max_length=1)
 
