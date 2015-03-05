@@ -5,16 +5,55 @@
   
   <div style='padding: 25px; margin: 15px; border: 1px solid; border-radius: 0.5em;'>
     <strong>Apply visualization:</strong><br/>
-    [<a href="#" id="vis_email">email performance</a>]
-    [<a href="#">page action</a>]
+    
+    {% if saved_query and saved_query.vis_emails or not saved_query %}
+      [<a href="#" id="vis_email">email performance</a>]
+    {% endif %}
+    {% if saved_query and saved_query.vis_actions or not saved_query %}
+      [<a href="#" id="vis_action">page action</a>]
+    {% endif %}
+    {% if saved_query and not saved_query.vis_emails and not saved_query.vis_actions %}
+      <em>no visualizations available for this query</em>
+    {% endif %}
     <br/>
-    <em>visualizations expect certain data formats - they won't work with arbitrary queries!</em>
+    
+    {% if not saved_query %}
+      <em>visualizations expect certain data formats - they won't work with arbitrary queries!</em>
+    {% endif %}
+    
   </div>
+  
+  {% if not saved_query %}
+    <div style='padding: 25px; margin: 15px; border: 1px solid; border-radius: 0.5em;'>
+      <strong>Save this query</strong>
+      <br/>
+      <form action="{% url 'query_save' %}" method="post" id="query_save">
+        {% csrf_token %}
+
+        Name: <input type="text" name="name" value=""/>
+        <br/>
+        <input type="checkbox" name="viz_email" id="can_viz_email"/> 
+        <label for="can_viz_email" style='font-weight: normal;'>allow email visualization</label><br/>
+        <input type="checkbox" name="viz_action" id="can_viz_action"/>
+        <label for="can_viz_action" style='font-weight: normal;'>allow actions visualization</label><br/>
+        <br/>
+        <input type="hidden" name="qry" value="{{ qry }}"/>
+        <input type="submit" value="Submit" />
+      </form>  
+      
+      
+    </div>
+  {% endif %}
   
   <div id="graph" style='width: 750px; height: 550px; display: none;'>
   </div>
   
   <table class="table striped-table" id="datatable">
+    <tr>
+      {% for h in headings %}
+        <th>{{ h }}</th>
+      {% endfor %}
+    </tr>
     {% for row in results %}
       <tr>
         {% for col in row %}
@@ -40,7 +79,7 @@
           //headings.push($(this).html());
           headings.push(idx);
         else {
-          if (idx == 0)
+          if (idx == 1)
             data.push([]);
             
           data[idx2-1].push($(this).html());
@@ -71,4 +110,69 @@
     });
     return false;
   });
+  
+  
+  function actions_chart() {
+    var data = {};
+    var current_date;
+    
+    var dates = [];
+    var sources = {};
+
+    // The nested loops here are staggeringly inefficient.
+    
+    $('#datatable tr').each(function(idx) {
+      var current_source;
+      $('td', $(this)).each(function(idx2) {
+        if (idx2 == 0) {
+          if (current_date != $(this).html())
+            dates.push($(this).html());
+          current_date = $(this).html();
+        } else if (idx2 == 1) {
+          current_source = $(this).html();
+          sources[$(this).html()] = true;
+        } else if (idx2 == 2) {
+          if (!data[current_date])
+            data[current_date] = {};
+          data[current_date][current_source] = $(this).html();
+        }
+      });
+      
+    });
+
+    // I said staggering...!
+        
+    formatted_sources = [];
+    $.each(sources, function (k, v) {
+      var current_source = [];
+      for (var i = 0; i < dates.length; i++)
+        current_source.push(data[dates[i]][k]);
+      formatted_sources.push(current_source)
+    });
+    
+    r.barchart(25, 25, 750, 500,
+               formatted_sources,
+               {stacked: true});
+        
+  }
+  
+  $('#vis_action').click(function() {
+    $('#graph').show(function() {
+      actions_chart();
+      
+      $('svg', $("#graph")).height($('#graph').height());
+      $('svg', $("#graph")).width($('#graph').width());
+    });
+    return false;
+  });
+  
+  $('#query_save').submit(function() {
+    var query_save = $(this).parent();
+    $.post($(this).attr('action'), $(this).serialize(), function(response) {
+      query_save.html(response);
+    });
+    return false;
+  });
+  
+  
 {% endblock %}

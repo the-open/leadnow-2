@@ -48,7 +48,10 @@ class Query(models.Model):
   class Meta:
     db_table = 'queries'
     
-  creator = models.ForeignKey('auth.User')
+  name = models.CharField(max_length=255)
+  qry = models.CharField(max_length=255)
+
+  creator = models.ForeignKey('auth.User', blank=True, null=True)
   created = models.DateTimeField(auto_now_add=True)
   
   vis_emails = models.BooleanField(default=False)
