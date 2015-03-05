@@ -13,8 +13,14 @@ def home(request):
 
 # Display a list of saved queries, plus an area to enter a new custom query
 def query(request):
+  campaigns = Campaign.objects.all()
+  email_campaigns = campaigns.filter(campaign_type='EBC')
+  action_campaigns = campaigns.filter(campaign_type='ETT')
   queries = Query.objects.all()
-  return render(request, 'query.html', {'queries': queries})
+  return render(request, 'query.html', {'queries': queries,
+                                         'email_campaigns': email_campaigns,
+                                         'action_campaigns': action_campaigns,
+                                        })
 
 
 # When we have saved queries, this will let you see the details of a saved query
