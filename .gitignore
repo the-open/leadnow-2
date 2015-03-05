@@ -14,4 +14,4 @@ local_settings.py
 
 # virtualenv
 python/
-
+ve/
