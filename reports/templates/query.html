@@ -25,28 +25,49 @@
   <br/>
 
   <hr/>
-  
+
   <strong>Sample queries</strong>
   <br/>
   If there are no saved queries, try...<br/>
-  
+
   The standard email report:<br/>
-  <form action="{% url 'report' %}" method="post">
+  <form id="emailreport" action="{% url 'report' %}" method="post">
     {% csrf_token %}
-    <input type="text" name="qry" value="SELECT date(opened), count(opened), count(clicked), count(hard_bounce), count(soft_bounce), count(unsub) FROM `emails` group by date(opened)"/>
+    <input type="hidden" name="qry" value="SELECT date(opened), count(opened), count(clicked), count(hard_bounce), count(soft_bounce), count(unsub) FROM `emails` group by date(opened)"/>
+    <select name="param1">
+      <option value="" default> -- </option>
+    {% for email in email_campaigns %}
+      <option value="{{email.name}}">{{ email.name }}</option>
+    {% endfor %}
+    </select>
+
+
     <input type="submit" value="Submit" />
-  </form>  
+  </form>
   (this query is not perfect - it assumes all days will have at least one open)
   <br/><br/>
-  
+
   <br/><br/>
   The standard actions report:<br/>
-  <form action="{% url 'report' %}" method="post">
+  <form id="actionreport" action="{% url 'report' %}" method="post">
     {% csrf_token %}
     <input type="text" name="qry" value="SELECT date(timestamp), source, count(*) FROM actions GROUP BY date(timestamp), source"/>
     <input type="submit" value="Submit" />
-  </form>  
-  
-  
+  </form>
 
+
+<script>
+
+$(document).ready(function {
+  $('form#emailreport').submit(function() {
+    if (this.param1!=="") {
+      this.qry += ' where name="' + this.param1 + '"';
+    }
+
+
+  });
+
+});
+
+</script>
 {% endblock %}
