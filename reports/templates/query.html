@@ -2,16 +2,18 @@
 
 {% block body %}
   <h2>Select a report</h2>
-  
+
   <ul>
+    {% comment %}
     {% for q in queries %}
       <li>
-        <a href="{% url 'query_details' q.id %}">{{ q.name }}</a> ({{ q.creator }}, {{ q.created }})
+        <a href="{% url 'report' q.id %}">{{ q.name }}</a> ({% if q.creator %}{{ q.creator }}, {% endif %}{{ q.created|date }})
       </li>
-      
+
     {% endfor %}
+    {% endcomment %}
   </ul>
-  
+
   <hr/>
   <strong>Or, use a new query...</strong>
   <br/>
