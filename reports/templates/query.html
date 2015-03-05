@@ -15,12 +15,15 @@
   </ul>
 
   <hr/>
-  <strong>Or, use a new query...</strong>
+  <strong>Or, try a new query...</strong>
   <br/>
-  (  TODO =)  )
-  
-  <br/><br/>
-  
+  <form action="{% url 'report' %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="qry" value=""/>
+    <input type="submit" value="Submit" />
+  </form>
+  <br/>
+
   <hr/>
   
   <strong>Sample queries</strong>
@@ -40,7 +43,7 @@
   The standard actions report:<br/>
   <form action="{% url 'report' %}" method="post">
     {% csrf_token %}
-    <input type="text" name="qry" value="SELECT * FROM actions"/>
+    <input type="text" name="qry" value="SELECT date(timestamp), source, count(*) FROM actions GROUP BY date(timestamp), source"/>
     <input type="submit" value="Submit" />
   </form>  
   
